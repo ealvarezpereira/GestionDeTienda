@@ -31,7 +31,6 @@ class ApartadoProductos(Gtk.Window):
         self.txtDescripcion = Gtk.Entry()
         self.txtPrecio = Gtk.Entry()
 
-
         boInsertar = Gtk.Button("Insertar Producto")
         boInsertar.connect("clicked", self.on_boInsertar_clicked)
 
@@ -80,18 +79,11 @@ class ApartadoProductos(Gtk.Window):
         columnaPrecio = Gtk.TreeViewColumn('Precio', celdaText3, text=2)
         self.vista.append_column(columnaPrecio)
 
-
         self.cajaMostrarProductos.pack_start(self.cmbNumeroProductos, False, False, 0)
         self.cajaMostrarProductos.pack_start(self.vista, True, True, 0)
         self.cajaMostrarProductos.pack_start(self.boBorrarProducto, False, False, 0)
 
         notebook.append_page(self.cajaMostrarProductos, Gtk.Label('Mostrar Producto'))
-
-
-
-
-
-
 
         self.add(notebook)
         self.show_all()
@@ -102,15 +94,14 @@ class ApartadoProductos(Gtk.Window):
                              self.txtNombre.get_text(),
                              self.txtDescripcion.get_text(),
                              int(self.txtPrecio.get_text())
+                             )
                             )
-                           )
 
         self.bbdd.commit()
         self.txtCodigo.set_text("")
         self.txtNombre.set_text("")
         self.txtDescripcion.set_text("")
         self.txtPrecio.set_text("")
-
 
     def on_seleccion_changed(self, boton):
         self.cursor.execute("select nomp,descripcion,precio from productos where codp ='" +

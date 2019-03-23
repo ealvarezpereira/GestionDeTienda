@@ -6,20 +6,46 @@ from sqlite3 import dbapi2
 
 
 class ApartadoClientes(Gtk.Window):
+    """
+    Clase Apartado clientes en la que el administrador gestiona a los clientes.
+
+    Métodos de la clase:
+
+    __init__ -> Constructor de la clase
+    on_seleccion_changed -> boton que recoge los datos del usuario de la base de datos
+    on_boInsertar_clicked -> boton que añade un usuario a la base de datos
+    on_boBorrarCliente_clicked -> boton que borra a un usuario de la base de datos
+    """
 
     def __init__(self):
+        """
+        Constructor que da forma a la ventana
+        :param cajaCrearClientes: Box con los componentes para crear un nuevo cliente
+        :param notebook: Gtk.Notebook para diferenciar crear cliente de mostrar cliente
+        :param grid: forma de disposición de los componentes para insertar un usuario
+        :param vista: TreeView donde se cargan los clientes de la base de datos
+        """
         Gtk.Window.__init__(self, title="Ventana de Clientes")
         self.set_border_width(10)
 
         self.bbdd = dbapi2.connect("TiendaInformatica.db")
         self.cursor = self.bbdd.cursor()
 
+        """
+        Creamos el Gtk.Notebook, la caja y el grid
+        """
         notebook = Gtk.Notebook()
+
+        # Pagina de crear clientes
 
         cajaCrearClientes = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
         grid = Gtk.Grid()
         grid.set_row_spacing(20)
         grid.set_column_spacing(10)
+
+        """
+        Creamos los botones y labels del apartado de insertar cliente
+        """
 
         lblNombre = Gtk.Label("Nombre:")
         lblApellido = Gtk.Label("Apellidos:")
@@ -41,6 +67,9 @@ class ApartadoClientes(Gtk.Window):
         boInsertar = Gtk.Button("Insertar Cliente")
         boInsertar.connect("clicked", self.on_boInsertar_clicked)
 
+        """
+        Introducimos los componentes en el grid y les especificamos la posicion y tamaño
+        """
         grid.attach(lblNombre, 0, 0, 1, 1)
         grid.attach(self.txtNombre, 1, 0, 1, 1)
         grid.attach_next_to(lblApellido, self.txtNombre, Gtk.PositionType.RIGHT, 1, 1)
@@ -57,16 +86,21 @@ class ApartadoClientes(Gtk.Window):
         grid.attach_next_to(self.cmbSexo, lblSexo, Gtk.PositionType.RIGHT, 1, 1)
         grid.attach_next_to(boInsertar, self.cmbSexo, Gtk.PositionType.BOTTOM, 1, 1)
 
+        """
+        Añadimos el grid a la caja, y añadimos la caja a una nueva ventana del notebook
+        """
         cajaCrearClientes.add(grid)
 
         notebook.append_page(cajaCrearClientes, Gtk.Label('Crear Cliente'))
 
-        # siguiente pagina
+        # Pagina de mostrar clientes
 
         self.cajaMostrarClientes = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
         self.bbdd = dbapi2.connect("TiendaInformatica.db")
         self.cursor = self.bbdd.cursor()
-
+        """
+        Creamos un combobox y añadimos los numeros de los clientes
+        """
         self.cmbNumeroCliente = Gtk.ComboBoxText()
 
         self.cursor.execute("select numc from clientes")
@@ -80,6 +114,9 @@ class ApartadoClientes(Gtk.Window):
         self.boBorrarCliente = Gtk.Button("Borrar Cliente")
         self.boBorrarCliente.connect("clicked", self.on_boBorrarCliente_clicked)
 
+        """
+        Creamos un treeview donde se cargarán los datos de los clientes y añadimos las columnas con el tipo de datos
+        """
         self.vista = Gtk.TreeView()
 
         celdaText = Gtk.CellRendererText()
@@ -102,10 +139,12 @@ class ApartadoClientes(Gtk.Window):
         columnaSexo = Gtk.TreeViewColumn('Sexo', celdaText5, text=4)
         self.vista.append_column(columnaSexo)
 
+        """
+        Añadimos los componentes creados a la caja y añadimos la caja al notebook como una nueva pagina
+        """
         self.cajaMostrarClientes.pack_start(self.cmbNumeroCliente, False, False, 0)
         self.cajaMostrarClientes.pack_start(self.vista, True, True, 0)
         self.cajaMostrarClientes.pack_start(self.boBorrarCliente, False, False, 0)
-
 
         notebook.append_page(self.cajaMostrarClientes, Gtk.Label('Mostrar Cliente'))
 
@@ -113,6 +152,15 @@ class ApartadoClientes(Gtk.Window):
         self.show_all()
 
     def on_seleccion_changed(self, boton):
+        """
+        Método que selecciona los datos del cliente con el numero que esté seleccionado en el combobox
+        :param boton: Parametro que recibe el metodo
+        :return: None
+
+        Seleccionamos los datos, creamos un modelo (ListStore), y añadimos los datos recogidos al modelo y lo
+        cargamos en el treeview
+        """
+
         self.cursor.execute("select nomc,apellidos,dni,direccion,sexo from clientes where numc ='" +
                             str(self.cmbNumeroCliente.get_active_text()) + "'")
         self.modelo = Gtk.ListStore(str, str, str, str, str)
@@ -128,8 +176,14 @@ class ApartadoClientes(Gtk.Window):
         print(self.modelo)
         self.vista.set_model(self.modelo)
 
-
     def on_boInsertar_clicked(self, boton):
+        """
+        Método que introduce un nuevo cliente en la base de datos.
+        :param boton: Parametro que recibe el metodo
+        :return: None
+
+        Seleccionamos los valores de los entry y se los pasamos al cursor.
+        """
         self.cursor.execute("insert into clientes values(?,?,?,?,?,?)",
                             (int(self.txtNumeroCliente.get_text()),
                              self.txtNombre.get_text(),
@@ -147,7 +201,15 @@ class ApartadoClientes(Gtk.Window):
         self.txtDni.set_text("")
 
     def on_boBorrarCliente_clicked(self, boton):
-        self.cursor.execute("delete from clientes where numc = '"+str(self.cmbNumeroCliente.get_active_text()) + "'")
+
+        """
+        Metodo que borra un cliente de la base de datos y del treeview
+        :param boton: Parametro que recibe el método
+        :return: None
+
+        Borramos el cliente que esté seleccionado en el treeview
+        """
+        self.cursor.execute("delete from clientes where numc = '" + str(self.cmbNumeroCliente.get_active_text()) + "'")
         self.bbdd.commit()
         self.cmbNumeroCliente.remove(self.cmbNumeroCliente.get_active())
         self.modelo.append(["", "", "", "", ""])

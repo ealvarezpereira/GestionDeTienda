@@ -2,7 +2,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from sqlite3 import dbapi2
-
+from FacturaSimplificada import FacturaSimplificada
 
 class VentanaCompras(Gtk.Window):
 
@@ -14,6 +14,7 @@ class VentanaCompras(Gtk.Window):
     __init__ -> Constructor de la clase
     on_amount_edited -> Método que cambia el valor al campo "Cantidad" de los productos en el TreeView
     on_boComprar_clicked -> Método que añade la compra del cliente a la base de datos.
+    on_boFinalizar_clicked -> Botón que genera una factura simplificada
     """
 
     def __init__(self, nCliente):
@@ -97,9 +98,13 @@ class VentanaCompras(Gtk.Window):
         self.codcli = nCliente
         boComprar = Gtk.Button("Comprar")
         boComprar.connect('clicked', self.on_boComprar_clicked)
+        boFinalizar = Gtk.Button("Finalizar Pedido")
+        boFinalizar.connect('clicked', self.on_boFinalizar_clicked)
 
         self.cajaProductos.pack_start(self.vista, True, True, 0)
         self.cajaProductos.pack_start(boComprar, True, True, 0)
+        self.cajaProductos.pack_start(boFinalizar, True, True, 0)
+
         self.add(self.cajaProductos)
         self.show_all()
 
@@ -135,3 +140,12 @@ class VentanaCompras(Gtk.Window):
             cantidad = self.modelo[puntero][3]
             self.cursor.execute("insert into factura values(?,?,?)", (self.codcli, codpr, cantidad))
             self.bbdd.commit()
+
+    def on_boFinalizar_clicked(self, boton):
+        """
+        Llamamos a la clase FacturaSimplificada y le pasamos el numero de cliente.
+        :param boton: Parametro que recibe el metodo
+        :return: None
+        """
+        FacturaSimplificada(self.codcli)
+
