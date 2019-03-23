@@ -6,8 +6,10 @@ Esta es una pequeña guía de uso de la aplicación.
 1. Cuando inicias la aplicación Te lleva a una ventana con un login
 
 Los usuarios son:
-Administrador -> Usuario para acceder a la parte de administración
-1001 -> Usuario cliente para acceder a la parte de compras
+
+- Administrador -> Usuario para acceder a la parte de administración
+
+- 1001 -> Usuario cliente para acceder a la parte de compras
 
 También puedes crear un nuevo cliente en el boton "Registrar Usuario"
 
