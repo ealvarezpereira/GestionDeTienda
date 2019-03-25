@@ -9,7 +9,21 @@ from reportlab.lib import colors
 
 
 class GenerarFactura(Gtk.Window):
+
+    """
+    Clase GenerarFactura que genera un informe detallado del cliente que el administrador especifique
+
+    Métodos de la clase:
+
+    __init__ -> Constructor de la clase
+    on_boGenerarFactura_clicked -> Evento del boton que selecciona el codigo del cliente seleccionado y crea la factura
+    generarFactura -> Metodo que le da forma al informe
+    """
     def __init__(self):
+
+        """
+        Recogemos los numeros de cliente de la tabla factura y los cargamos en un combobox
+        """
         Gtk.Window.__init__(self, title="Ventana de Facturas")
 
         self.bbdd = dbapi2.connect("TiendaInformatica.db")
@@ -34,25 +48,41 @@ class GenerarFactura(Gtk.Window):
         self.show_all()
 
     def on_boGenerarFactura_clicked(self, boton):
+        """
+        Recogemos el numero de cliente seleccionado en el combobox y llamamos al método que genera el informe
+        :param boton: Parametro que recibe el metodo
+        :return: None
+        """
         self.numc = self.cmbNumeroCliente.get_active_text()
         self.crearFactura()
 
     def crearFactura(self):
+        """
+        :param numc -> Numero de cliente que se recoge del combobox
+        :return: None
+        """
 
         numc = self.numc
         try:
             bbdd = dbapi2.connect("TiendaInformatica.db")
             cursor = bbdd.cursor()
 
+            """
+            :param detallefactura -> valores de la factura
+            :param facturas -> numero de facturas
+            """
             detalleFactura = []
             facturas = []
 
-            # Primera linea de la factura.
+            # Primera linea de la factura. Codigo del cliente
             detalleFactura.append(['Codigo Cliente: ', numc])
 
+            """
+            Recogemos todos los datos del cliente que hemos seleccionado, y los añadimos a la lista detallefactura
+            """
             cursorConsultaFactura = cursor.execute(
                 "select nomc,apellidos,dni,direccion from clientes where numc = '" + str(numc) + "'")
-            print("polla")
+
             registroCliente = cursorConsultaFactura.fetchone()
 
             detalleFactura.append(['Nombre', registroCliente[0], '', '', ''])
@@ -63,12 +93,21 @@ class GenerarFactura(Gtk.Window):
             cursorConsultaDetalle = cursor.execute("select codp, cantidad from factura where numc = ?", (int(numc),))
             listaConsultaDetalleFactura = []
 
+            """
+            Seleccionamos el codigo de producto que ha comprado el cliente y la cantidad de ese producto
+            y recorremos los productos obtenidos
+            """
             for elementoFac in cursorConsultaDetalle:
                 listaConsultaDetalleFactura.append([elementoFac[0], elementoFac[1]])
             detalleFactura.append(["", "", "", ""])
 
             detalleFactura.append(["Producto", "Descripción", "Cantidad", "Precio unitario", "Precio"])
             precioTotal = 0
+
+            """
+            Para cada producto obtenido recogemos sus datos de la base de datos, y lo recorremos para añadirlos a la
+            factura.
+            """
             for elemento in listaConsultaDetalleFactura:
                 cursorConsultaProducto = cursor.execute(
                     "select descripcion, precio, nomp from productos where codp = '" +
@@ -79,6 +118,9 @@ class GenerarFactura(Gtk.Window):
                     [registroProducto[2], registroProducto[0], elemento[1], registroProducto[1], precio])
                 precioTotal = precioTotal + precio
 
+            """
+            Añadimos el precio total que es la suma de todos los productos
+            """
             detalleFactura.append(["", "", "", "Precio total: ", precioTotal])
             facturas.append(list(detalleFactura))
             detalleFactura.clear()
@@ -91,6 +133,9 @@ class GenerarFactura(Gtk.Window):
             cursor.close()
             bbdd.close()
 
+            """
+            Creamos un documento, y le añadimos una tabla formateada a nuestro gusto
+            """
             doc = SimpleDocTemplate(("Factura_" + str(numc) + ".pdf"), pagesize=A4)
             guion = []
 
@@ -116,5 +161,8 @@ class GenerarFactura(Gtk.Window):
             bbdd = dbapi2.connect("TiendaInformatica.db")
             cursor = bbdd.cursor()
 
+            """
+            Una vez generamos la factura borramos el pedido del cliente de la tabla factura.
+            """
             cursor.execute("delete from factura where numc = ?", [str(numc)])
             bbdd.commit()

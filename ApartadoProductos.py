@@ -6,7 +6,25 @@ from sqlite3 import dbapi2
 
 
 class ApartadoProductos(Gtk.Window):
+    """
+    Clase Apartado productos en la que el administrador gestiona los productos.
+
+    Métodos de la clase:
+
+    __init__ -> Constructor de la clase
+    on_seleccion_changed -> boton que recoge los datos del producto de la base de datos
+    on_boInsertar_clicked -> boton que añade un producto a la base de datos
+    on_boBorrarProductos_clicked -> boton que borra un producto de la base de datos
+    """
+
     def __init__(self):
+        """
+        Constructor que da forma a la ventana
+        :param cajaCrearProductos: Box con los componentes para crear un nuevo producto
+        :param notebook: Gtk.Notebook para diferenciar crear producto de mostrar producto
+        :param grid: forma de disposición de los componentes para insertar un producto
+        :param vista: TreeView donde se cargan los productos de la base de datos
+        """
         Gtk.Window.__init__(self, title="Ventana de Productos")
 
         self.set_border_width(10)
@@ -14,13 +32,21 @@ class ApartadoProductos(Gtk.Window):
         self.bbdd = dbapi2.connect("TiendaInformatica.db")
         self.cursor = self.bbdd.cursor()
 
+        """
+        Creamos el Gtk.Notebook, la caja y el grid
+        """
         notebook = Gtk.Notebook()
 
-        cajaCrearClientes = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+        # Pagina de crear productos
+
+        cajaCrearProductos = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
         grid = Gtk.Grid()
         grid.set_row_spacing(20)
         grid.set_column_spacing(10)
 
+        """
+        Creamos los botones y labels del apartado de insertar producto
+        """
         lblCodigo = Gtk.Label("Codigo:")
         lblNombre = Gtk.Label("Nombre:")
         lblDescripcion = Gtk.Label("Descripcion:")
@@ -34,6 +60,9 @@ class ApartadoProductos(Gtk.Window):
         boInsertar = Gtk.Button("Insertar Producto")
         boInsertar.connect("clicked", self.on_boInsertar_clicked)
 
+        """
+        Introducimos los componentes en el grid y les especificamos la posicion y tamaño
+        """
         grid.attach(lblCodigo, 0, 0, 1, 1)
         grid.attach(self.txtCodigo, 1, 0, 1, 1)
         grid.attach_next_to(lblNombre, self.txtCodigo, Gtk.PositionType.RIGHT, 1, 1)
@@ -44,13 +73,22 @@ class ApartadoProductos(Gtk.Window):
         grid.attach_next_to(self.txtPrecio, lblPrecio, Gtk.PositionType.RIGHT, 1, 1)
         grid.attach_next_to(boInsertar, self.txtPrecio, Gtk.PositionType.BOTTOM, 1, 1)
 
-        cajaCrearClientes.add(grid)
+        """
+        Añadimos el grid a la caja, y añadimos la caja a una nueva ventana del notebook
+        """
+        cajaCrearProductos.add(grid)
 
-        notebook.append_page(cajaCrearClientes, Gtk.Label('Crear Producto'))
+        notebook.append_page(cajaCrearProductos, Gtk.Label('Crear Producto'))
+
+        # Pagina de mostrar productos
 
         self.cajaMostrarProductos = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
         self.bbdd = dbapi2.connect("TiendaInformatica.db")
         self.cursor = self.bbdd.cursor()
+
+        """
+        Creamos un combobox y añadimos los codigos de los productos
+        """
 
         self.cmbNumeroProductos = Gtk.ComboBoxText()
 
@@ -63,8 +101,11 @@ class ApartadoProductos(Gtk.Window):
         self.cmbNumeroProductos.connect("changed", self.on_seleccion_changed)
 
         self.boBorrarProducto = Gtk.Button("Borrar Producto")
-        # self.boBorrarProducto.connect("clicked", self.on_boBorrarProducto_clicked)
+        self.boBorrarProducto.connect("clicked", self.on_boBorrarProducto_clicked)
 
+        """
+        Creamos un treeview donde se cargarán los datos de los productos y añadimos las columnas con el tipo de datos
+        """
         self.vista = Gtk.TreeView()
 
         celdaText = Gtk.CellRendererText()
@@ -79,6 +120,9 @@ class ApartadoProductos(Gtk.Window):
         columnaPrecio = Gtk.TreeViewColumn('Precio', celdaText3, text=2)
         self.vista.append_column(columnaPrecio)
 
+        """
+        Añadimos los componentes creados a la caja y añadimos la caja al notebook como una nueva pagina
+        """
         self.cajaMostrarProductos.pack_start(self.cmbNumeroProductos, False, False, 0)
         self.cajaMostrarProductos.pack_start(self.vista, True, True, 0)
         self.cajaMostrarProductos.pack_start(self.boBorrarProducto, False, False, 0)
@@ -89,6 +133,13 @@ class ApartadoProductos(Gtk.Window):
         self.show_all()
 
     def on_boInsertar_clicked(self, boton):
+        """
+        Método que introduce un nuevo producto en la base de datos.
+        :param boton: Parametro que recibe el metodo
+        :return: None
+
+        Seleccionamos los valores de los entry y se los pasamos al cursor.
+        """
         self.cursor.execute("insert into productos values(?,?,?,?)",
                             (int(self.txtCodigo.get_text()),
                              self.txtNombre.get_text(),
@@ -104,6 +155,15 @@ class ApartadoProductos(Gtk.Window):
         self.txtPrecio.set_text("")
 
     def on_seleccion_changed(self, boton):
+        """
+        Método que selecciona los datos del producto con el numero que esté seleccionado en el combobox
+        :param boton: Parametro que recibe el metodo
+        :return: None
+
+        Seleccionamos los datos, creamos un modelo (ListStore), y añadimos los datos recogidos al modelo y lo
+        cargamos en el treeview
+        """
+
         self.cursor.execute("select nomp,descripcion,precio from productos where codp ='" +
                             str(self.cmbNumeroProductos.get_active_text()) + "'")
         self.modelo = Gtk.ListStore(str, str, int)
@@ -115,4 +175,18 @@ class ApartadoProductos(Gtk.Window):
         precio = valores[2]
         self.modelo.append([nombre, descripcion, precio])
         print(self.modelo)
+        self.vista.set_model(self.modelo)
+
+    def on_boBorrarProducto_clicked(self, boton):
+        """
+                Metodo que borra un cliente de la base de datos y del treeview
+                :param boton: Parametro que recibe el método
+                :return: None
+
+                Borramos el producto que esté seleccionado en el treeview
+                """
+        self.cursor.execute("delete from productos where codp = '" + str(self.cmbNumeroProductos.get_active_text()) + "'")
+        self.bbdd.commit()
+        self.cmbNumeroProductos.remove(self.cmbNumeroProductos.get_active())
+        self.modelo.append(["", "", "", "", ""])
         self.vista.set_model(self.modelo)
