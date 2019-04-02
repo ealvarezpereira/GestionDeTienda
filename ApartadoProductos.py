@@ -135,10 +135,11 @@ class ApartadoProductos(Gtk.Window):
     def on_boInsertar_clicked(self, boton):
         """
         Método que introduce un nuevo producto en la base de datos.
+        Seleccionamos los valores de los entry y se los pasamos al cursor.
+
         :param boton: Parametro que recibe el metodo
         :return: None
 
-        Seleccionamos los valores de los entry y se los pasamos al cursor.
         """
         self.cursor.execute("insert into productos values(?,?,?,?)",
                             (int(self.txtCodigo.get_text()),
@@ -157,11 +158,13 @@ class ApartadoProductos(Gtk.Window):
     def on_seleccion_changed(self, boton):
         """
         Método que selecciona los datos del producto con el numero que esté seleccionado en el combobox
+        Seleccionamos los datos, creamos un modelo (ListStore), y añadimos los datos recogidos al modelo y lo
+        cargamos en el treeview
+
         :param boton: Parametro que recibe el metodo
         :return: None
 
-        Seleccionamos los datos, creamos un modelo (ListStore), y añadimos los datos recogidos al modelo y lo
-        cargamos en el treeview
+
         """
 
         self.cursor.execute("select nomp,descripcion,precio from productos where codp ='" +
@@ -179,13 +182,15 @@ class ApartadoProductos(Gtk.Window):
 
     def on_boBorrarProducto_clicked(self, boton):
         """
-                Metodo que borra un cliente de la base de datos y del treeview
-                :param boton: Parametro que recibe el método
-                :return: None
+        Metodo que borra un cliente de la base de datos y del treeview
+        Borramos el producto que esté seleccionado en el treeview
 
-                Borramos el producto que esté seleccionado en el treeview
-                """
-        self.cursor.execute("delete from productos where codp = '" + str(self.cmbNumeroProductos.get_active_text()) + "'")
+        :param boton: Parametro que recibe el método
+        :return: None
+
+        """
+        self.cursor.execute(
+            "delete from productos where codp = '" + str(self.cmbNumeroProductos.get_active_text()) + "'")
         self.bbdd.commit()
         self.cmbNumeroProductos.remove(self.cmbNumeroProductos.get_active())
         self.modelo.append(["", "", "", "", ""])

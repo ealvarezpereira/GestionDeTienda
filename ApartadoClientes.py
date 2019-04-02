@@ -6,16 +6,6 @@ from sqlite3 import dbapi2
 
 
 class ApartadoClientes(Gtk.Window):
-    """
-    Clase Apartado clientes en la que el administrador gestiona a los clientes.
-
-    Métodos de la clase:
-
-    __init__ -> Constructor de la clase
-    on_seleccion_changed -> boton que recoge los datos del usuario de la base de datos
-    on_boInsertar_clicked -> boton que añade un usuario a la base de datos
-    on_boBorrarCliente_clicked -> boton que borra a un usuario de la base de datos
-    """
 
     def __init__(self):
         """
@@ -154,11 +144,13 @@ class ApartadoClientes(Gtk.Window):
     def on_seleccion_changed(self, boton):
         """
         Método que selecciona los datos del cliente con el numero que esté seleccionado en el combobox
+        Seleccionamos los datos, creamos un modelo (ListStore), y añadimos los datos recogidos al modelo y lo
+        cargamos en el treeview
+
         :param boton: Parametro que recibe el metodo
         :return: None
 
-        Seleccionamos los datos, creamos un modelo (ListStore), y añadimos los datos recogidos al modelo y lo
-        cargamos en el treeview
+
         """
 
         self.cursor.execute("select nomc,apellidos,dni,direccion,sexo from clientes where numc ='" +
@@ -178,11 +170,12 @@ class ApartadoClientes(Gtk.Window):
 
     def on_boInsertar_clicked(self, boton):
         """
+        Seleccionamos los valores de los entry y se los pasamos al cursor.
+
         Método que introduce un nuevo cliente en la base de datos.
         :param boton: Parametro que recibe el metodo
         :return: None
 
-        Seleccionamos los valores de los entry y se los pasamos al cursor.
         """
         self.cursor.execute("insert into clientes values(?,?,?,?,?,?)",
                             (int(self.txtNumeroCliente.get_text()),
@@ -204,10 +197,10 @@ class ApartadoClientes(Gtk.Window):
 
         """
         Metodo que borra un cliente de la base de datos y del treeview
+        Borramos el cliente que esté seleccionado en el treeview
         :param boton: Parametro que recibe el método
         :return: None
 
-        Borramos el cliente que esté seleccionado en el treeview
         """
         self.cursor.execute("delete from clientes where numc = '" + str(self.cmbNumeroCliente.get_active_text()) + "'")
         self.bbdd.commit()

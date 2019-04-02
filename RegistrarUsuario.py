@@ -6,14 +6,6 @@ from sqlite3 import dbapi2
 
 
 class RegistrarUsuario(Gtk.Window):
-    """
-    Clase RegistrarUsuario que es llamada por el login para registrar un usuario en la base de datos.
-
-    Métodos de la clase:
-
-    __init__ -> Constructor de la clase
-    on_boInsertar_clicked -> Metodo que inserta un nuevo cliente
-    """
 
     def __init__(self):
         Gtk.Window.__init__(self, title="Registrar un Usuario")

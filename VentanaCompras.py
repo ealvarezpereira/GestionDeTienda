@@ -6,17 +6,6 @@ from FacturaSimplificada import FacturaSimplificada
 
 class VentanaCompras(Gtk.Window):
 
-    """
-    Clase VentanaCompras en la que los clientes pueden comprar artículos
-
-    Métodos de la clase:
-
-    __init__ -> Constructor de la clase
-    on_amount_edited -> Método que cambia el valor al campo "Cantidad" de los productos en el TreeView
-    on_boComprar_clicked -> Método que añade la compra del cliente a la base de datos.
-    on_boFinalizar_clicked -> Botón que genera una factura simplificada
-    """
-
     def __init__(self, nCliente):
 
         """
@@ -28,10 +17,11 @@ class VentanaCompras(Gtk.Window):
         self.cajaProductos = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
 
         """
-        Iniciamos la conexión a la base de datos.
+        Iniciamos la conexión a la base de datos.        
+        Seleccionamos todos los datos de la tabla productos
+
         :param bbdd: Parámetro que conecta a la base de datos
         :param cursor: Cursor con el que recibimos datos de la base de datos.
-        Seleccionamos todos los datos de la tabla productos
         """
 
         self.bbdd = dbapi2.connect("TiendaInformatica.db")
@@ -40,7 +30,7 @@ class VentanaCompras(Gtk.Window):
 
         """
         Creamos un modelo al que le pasamos los tipos de valores de cada dato de la tabla
-        :param modelo: Lista que recibe los datos de la tabla para añadirlo al TreeView
+        modelo: Lista que recibe los datos de la tabla para añadirlo al TreeView
         """
         self.modelo = Gtk.ListStore(int, str, int, int)
 
@@ -54,12 +44,12 @@ class VentanaCompras(Gtk.Window):
             self.modelo.append([codigo, nombre, precio, 1])
 
         """
-        :param vista: TreeView que contendrá los productos
-        :param celdaText: CellRendererText que recibirá los valores
-        :param columnaCodigo: columna del TreeView que contiene el codigo
-        :param columnaNombre: columna del TreeView que contiene el nombre
-        :param columnaPrecio: columna del TreeView que contiene el precio
-        :param columnaCantidad: columna del TreeView que contiene la cantidad.
+        vista: TreeView que contendrá los productos
+        celdaText: CellRendererText que recibirá los valores
+        columnaCodigo: columna del TreeView que contiene el codigo
+        columnaNombre: columna del TreeView que contiene el nombre
+        columnaPrecio: columna del TreeView que contiene el precio
+        columnaCantidad: columna del TreeView que contiene la cantidad.
         """
         self.vista = Gtk.TreeView()
 
@@ -111,21 +101,24 @@ class VentanaCompras(Gtk.Window):
     def on_amount_edited(self, widget, path, value):
         """
         Método que establece la cantidad en el TreeView cuando la cambias
+
+        A ese componente del modelo se le asigna el valor que hemos editado
+
         :param widget: Componente en sí
         :param path: Puntero en el que está situado el cursor
         :param value: Valor que recibe del SpinButton
         :return: None
-        A ese componente del modelo se le asigna el valor que hemos editado
         """
         self.modelo[path][3] = int(value)
 
     def on_boComprar_clicked(self, boton):
         """
         Método que introduce lo que quieres comprar en la base de datos, en la tabla "factura"
+        Establecemos la conexion con la base de datos, creamos el puntero e introducimos el valor en la tabla
+
         :param boton: Parametro que recibe el metodo
         :return: None
 
-        Establecemos la conexion con la base de datos, creamos el puntero e introducimos el valor en la tabla
         """
         self.bbdd = dbapi2.connect("TiendaInformatica.db")
         self.cursor = self.bbdd.cursor()

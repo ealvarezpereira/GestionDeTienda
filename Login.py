@@ -9,27 +9,16 @@ from sqlite3 import dbapi2
 
 
 class VentanaPrincipal(Gtk.Window):
-    """
-    Clase VentanaPrincipal donde el usuario se identifica.
-
-    Métodos de la clase:
-
-    __init__ -> Constructor de la clase
-    on_boRegistrarse_clicked -> Boton para registrar cliente
-    on_boLogin_clicked -> Boton para iniciar sesión
-    """
 
     def __init__(self):
         """
-        Método que crea la interfaz del login.
-
         Componentes:
-        :param cajaComponentes: Caja que contiene todos los componentes
-        :param lblUsuario: Etiqueta usuario
-        :param txtUsuario: Entrada de texto para introducir el usuario
-        :param boRegistrarse: Boton para registrar usuario
-        :param boLogin: Boton para iniciar sesion
-        :param grid: componente que da forma de visualizacion
+        cajaComponentes: Caja que contiene todos los componentes
+        lblUsuario: Etiqueta usuario
+        txtUsuario: Entrada de texto para introducir el usuario
+        boRegistrarse: Boton para registrar usuario
+        boLogin: Boton para iniciar sesion
+        grid: componente que da forma de visualizacion
         """
         Gtk.Window.__init__(self, title="Proyecto de clase")
 
@@ -64,25 +53,23 @@ class VentanaPrincipal(Gtk.Window):
 
     def on_boRegistrarse_clicked(self, boton):
         """
+        Llama a la clase que registra un usuario
 
         :param boton: Parametro que recibe el metodo
         :return: None
-
-        Llama a la clase que registra un usuario
         """
         RegistrarUsuario()
 
     def on_boLogin_clicked(self, boton):
         """
-
-        :param boton: Parametro que recibe el metodo
-        :return: None
-
         Si el usuario que recibe el TextEntry es "Administrador" llama a la clase VentanaAdmin() que administra
         la parte del administrador.
 
         Por el contrario comprueba si el usuario está en la base de datos y si es así loguea, si no cambia el color
         del texto del Entry a rojo y muestra que el usuario es incorrecto
+
+        :param boton: Parametro que recibe el metodo
+        :return: None
         """
 
         if self.txtUsuario.get_text() == "Administrador":

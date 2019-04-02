@@ -7,16 +7,6 @@ from ApartadoProductos import ApartadoProductos
 from GenerarFactura import GenerarFactura
 
 class VentanaAdmin(Gtk.Window):
-    """
-    VentanaAdmin es la ventana de la gestión del administrador
-
-    Métodos de la clase:
-
-    __init__ -> Constructor de la clase.
-    on_boClientes_clicked -> Metodo que abre el apartado de gestión de clientes
-    on_boProductos_clicked -> Metodo que abre el apartado de gestión de productos
-    on_boGenerarFactura_clicked -> Metodo que abre el apartado de generar factura de cliente
-    """
 
     def __init__(self):
 

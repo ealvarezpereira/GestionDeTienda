@@ -10,15 +10,7 @@ from reportlab.lib import colors
 
 class GenerarFactura(Gtk.Window):
 
-    """
-    Clase GenerarFactura que genera un informe detallado del cliente que el administrador especifique
 
-    Métodos de la clase:
-
-    __init__ -> Constructor de la clase
-    on_boGenerarFactura_clicked -> Evento del boton que selecciona el codigo del cliente seleccionado y crea la factura
-    generarFactura -> Metodo que le da forma al informe
-    """
     def __init__(self):
 
         """

@@ -12,13 +12,6 @@ from reportlab.lib.styles import getSampleStyleSheet
 
 
 class FacturaSimplificada(Gtk.Window):
-    """
-    Clase FacturaSimplificada que genera un informe
-
-    Métodos de la clase:
-
-    __init__ -> constructor de la clase
-    """
 
     def __init__(self, nCliente):
         """
